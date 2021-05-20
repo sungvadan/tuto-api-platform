@@ -4,11 +4,25 @@ namespace App\Entity;
 
 use ApiPlatform\Core\Annotation\ApiProperty;
 use ApiPlatform\Core\Annotation\ApiResource;
+use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Uid\Uuid;
+use Symfony\Component\Validator\Constraints\Length;
+use Symfony\Component\Validator\Constraints\NotBlank;
 
 #[ApiResource(
-    itemOperations: ['get'],
-    collectionOperations: ['get', 'post'],
+    itemOperations: [
+        'get',
+        'put' => [
+            'denormalization_context' => [
+                'groups' => ['put:Dependency']
+            ]
+        ],
+        'delete'
+    ],
+    collectionOperations: [
+        'get',
+        'post',
+    ],
     paginationEnabled: false
 )]
 class Dependency
@@ -18,18 +32,27 @@ class Dependency
     )]
     private string $uuid;
 
-    #[ApiProperty(
-        description: 'Nom de la dépendance'
-    )]
+    #[
+        ApiProperty(
+            description: 'Nom de la dépendance'
+        ),
+        Length(min: 2),
+        NotBlank
+    ]
     private string $name;
 
-    #[ApiProperty(
-        description: 'Version de la dépendance',
-        openapiContext: [
-            'example' => '5.2.*'
-        ]
+    #[
+        ApiProperty(
+            description: 'Version de la dépendance',
+            openapiContext: [
+                'example' => '5.2.*'
+            ]
 
-    )]
+        ),
+        Length(min: 2),
+        NotBlank,
+        Groups(['put:Dependency'])
+    ]
     private string $version;
 
     public function __construct(
@@ -63,5 +86,21 @@ class Dependency
     public function getVersion(): string
     {
         return $this->version;
+    }
+
+    /**
+     * @param string $name
+     */
+    public function setName(string $name): void
+    {
+        $this->name = $name;
+    }
+
+    /**
+     * @param string $version
+     */
+    public function setVersion(string $version): void
+    {
+        $this->version = $version;
     }
 }

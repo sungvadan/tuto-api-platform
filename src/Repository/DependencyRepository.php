@@ -6,8 +6,12 @@ use App\Entity\Dependency;
 
 class DependencyRepository
 {
+    /** @var string */
+    private $path;
+
     public function __construct(private string $rootPath)
     {
+        $this->path = $this->rootPath . '/composer.json';
     }
 
     /**
@@ -15,8 +19,7 @@ class DependencyRepository
      */
     public function findAll(): array
     {
-        $path = $this->rootPath . '/composer.json';
-        $json = json_decode(file_get_contents($path), true);
+        $json = json_decode(file_get_contents($this->path), true);
         $items = [];
         foreach ($json['require'] as $name => $version) {
             $items[] = new Dependency($name, $version);
@@ -35,5 +38,19 @@ class DependencyRepository
         }
 
         return null;
+    }
+
+    public function persist(Dependency $dependency): void
+    {
+        $json = json_decode(file_get_contents($this->path), true);
+        $json['require'][$dependency->getName()] = $dependency->getVersion();
+        file_put_contents($this->path, json_encode($json, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES));
+    }
+
+    public function remove(Dependency $dependency): void
+    {
+        $json = json_decode(file_get_contents($this->path), true);
+        unset($json['require'][$dependency->getName()]);
+        file_put_contents($this->path, json_encode($json, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES));
     }
 }
