@@ -21,7 +21,11 @@ security:
             json_login:
                 check_path: api_login
             logout:
-                path: api_logout
+                path: app_logout
+                target: app_login
+            guard:
+                authenticators:
+                    - App\Security\AppAuthenticator
 
             # activate different ways to authenticate
             # https://symfony.com/doc/current/security.html#firewalls-authentication

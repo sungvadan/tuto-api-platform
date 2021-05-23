@@ -15,20 +15,20 @@ use Symfony\Component\Serializer\Annotation\Groups;
  */
 #[ApiResource(
    collectionOperations: [
-       'me' => [
-           'path' => '/me',
-           'method' => 'get',
-           'controller' => MeController::class,
-           'pagination_enabled' => false,
-           'read' => false,
-           'openapi_context' => [
-               'security' => ['cookieAuth' => []]
-           ]
-       ]
   ],
    itemOperations: [
-       'get' => [
-           'controller' => NotFoundAction::class,
+    'me' => [
+        'path' => '/me',
+        'method' => 'get',
+        'controller' => MeController::class,
+        'pagination_enabled' => false,
+        'read' => false,
+        'openapi_context' => [
+            'security' => ['cookieAuth' => []]
+        ]
+    ],
+    'get' => [
+        'controller' => NotFoundAction::class,
            'openapi_context' => ['summary' => 'hidden'],
            'read' => false,
            'output' => false

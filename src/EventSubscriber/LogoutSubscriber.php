@@ -12,7 +12,7 @@ class LogoutSubscriber implements EventSubscriberInterface
     public function onLogoutEvent(LogoutEvent $event)
     {
         if (in_array('application/json', $event->getRequest()->getAcceptableContentTypes())) {
-            $event->setResponse(new JsonResponse(null, Response::HTTP_METHOD_NOT_ALLOWED));
+            $event->setResponse(new JsonResponse(null, Response::HTTP_NO_CONTENT));
         }
     }
 
