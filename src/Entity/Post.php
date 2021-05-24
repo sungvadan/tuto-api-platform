@@ -50,7 +50,12 @@ use Symfony\Component\Validator\Constraints\Valid;
         paginationMaximumItemsPerPage: 2,
         paginationClientItemsPerPage: true,
         collectionOperations: [
-            'get',
+            'get' => [
+                'openapi_context' => [
+                    'security' => ['bearerAuth' => []]
+                ],
+                'security' => 'is_granted("ROLE_USER")'
+            ],
             'post',
             'count' => [
                 'method' => 'get',

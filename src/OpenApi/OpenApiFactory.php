@@ -27,10 +27,10 @@ class OpenApiFactory implements OpenApiFactoryInterface
         }
 
         $securitySchemes = $openApi->getComponents()->getSecuritySchemes();
-        $securitySchemes['cookieAuth'] = new \ArrayObject([
-            'type' => 'apiKey',
-            'in' => 'cookie',
-            'name' => 'PHPSESSID'
+        $securitySchemes['bearerAuth'] = new \ArrayObject([
+            'type' => 'http',
+            'scheme' => 'bearer',
+            'bearerFormat' => 'JWT'
         ]);
 
 //        $openApi = $openApi->withSecurity(['cookieAuth' => []]);
@@ -49,6 +49,15 @@ class OpenApiFactory implements OpenApiFactoryInterface
             ]
         ]);
 
+        $schemas['Token'] = new \ArrayObject([
+            'type' => 'object',
+            'properties' => [
+                'token' => [
+                    'type' => 'string',
+                ],
+            ]
+        ]);
+
         $pathItem = new PathItem(
             post: new Operation(
                 operationId: 'PostLogin',
@@ -59,7 +68,7 @@ class OpenApiFactory implements OpenApiFactoryInterface
                        'content' => [
                            'application/json' => [
                                'schema' => [
-                                   '$ref' => '#/components/schemas/User-read.User'
+                                   '$ref' => '#/components/schemas/Token'
                                ]
                            ]
                        ]

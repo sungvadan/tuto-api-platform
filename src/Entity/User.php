@@ -7,6 +7,7 @@ use ApiPlatform\Core\Annotation\ApiResource;
 use App\Controller\MeController;
 use App\Repository\UserRepository;
 use Doctrine\ORM\Mapping as ORM;
+use Lexik\Bundle\JWTAuthenticationBundle\Security\User\JWTUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Serializer\Annotation\Groups;
 
@@ -24,7 +25,7 @@ use Symfony\Component\Serializer\Annotation\Groups;
         'pagination_enabled' => false,
         'read' => false,
         'openapi_context' => [
-            'security' => ['cookieAuth' => []]
+            'security' => ['bearerAuth' => []]
         ]
     ],
     'get' => [
@@ -37,7 +38,7 @@ use Symfony\Component\Serializer\Annotation\Groups;
    normalizationContext: ['groups' => ['read:User']],
    security: 'is_granted("ROLE_USER")'
 )]
-class User implements UserInterface
+class User implements UserInterface, JWTUserInterface
 {
     /**
      * @ORM\Id
@@ -144,6 +145,22 @@ class User implements UserInterface
     {
         // If you store any temporary, sensitive data on the user, clear it here
         // $this->plainPassword = null;
+    }
+
+
+    public function setId($id)
+    {
+        $this->id = $id;
+        return $this;
+    }
+
+
+    public static function createFromPayload($id, array $payload)
+    {
+        return (new User())
+            ->setId($id)
+            ->setEmail($payload['username'] ?? '');
+            ;
     }
 }
 
