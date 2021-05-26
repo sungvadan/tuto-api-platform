@@ -10,6 +10,10 @@ security:
             entity:
                 class: App\Entity\User
                 property: email
+        api_key_user_provider:
+            entity:
+                class: App\Entity\User
+                property: apiKey
         jwt:
             lexik_jwt:
                 class: App\Entity\User
@@ -17,27 +21,33 @@ security:
         dev:
             pattern: ^/(_(profiler|wdt)|css|images|js)/
             security: false
-        refresh:
-            pattern:  ^/api/token/refresh
-            stateless: true
+        apiKey:
             anonymous: true
-        login:
-            pattern:  ^/api/login
-            stateless: true
-            anonymous: true
-            provider: app_user_provider
-            json_login:
-                check_path:               /api/login
-                success_handler:          lexik_jwt_authentication.handler.authentication_success
-                failure_handler:          lexik_jwt_authentication.handler.authentication_failure
-        api:
-            pattern:   ^/api
-            stateless: true
-            anonymous: true
-            provider: jwt
+            provider: api_key_user_provider
             guard:
                 authenticators:
-                    - lexik_jwt_authentication.jwt_token_authenticator
+                    - App\Security\ApiKeyAuthenticator
+#        refresh:
+#            pattern:  ^/api/token/refresh
+#            stateless: true
+#            anonymous: true
+#        login:
+#            pattern:  ^/api/login
+#            stateless: true
+#            anonymous: true
+#            provider: app_user_provider
+#            json_login:
+#                check_path:               /api/login
+#                success_handler:          lexik_jwt_authentication.handler.authentication_success
+#                failure_handler:          lexik_jwt_authentication.handler.authentication_failure
+#        api:
+#            pattern:   ^/api
+#            stateless: true
+#            anonymous: true
+#            provider: jwt
+#            guard:
+#                authenticators:
+#                    - lexik_jwt_authentication.jwt_token_authenticator
 #        main:
 #            anonymous: true
 #            lazy: true
