@@ -54,7 +54,7 @@ use Symfony\Component\Validator\Constraints\Valid;
                 'openapi_context' => [
                     'security' => ['bearerAuth' => []]
                 ],
-                'security' => 'is_granted("ROLE_USER")'
+//                'security' => 'is_granted("ROLE_USER")'
             ],
             'post',
             'count' => [
@@ -105,7 +105,7 @@ class Post implements UserOwnedInterface
     /**
      * @ORM\Column(type="string", length=255)
      */
-    #[Groups(['read:collection', 'put:Post', 'write:Post'])]
+    #[Groups(['read:collection:User', 'put:Post', 'write:Post'])]
     private $slug;
 
     /**
@@ -137,7 +137,7 @@ class Post implements UserOwnedInterface
      * @ORM\Column(type="boolean", options={"default"="0"})
      */
     #[
-        Groups(['read:collection']),
+        Groups(['read:collection:User']),
         ApiProperty(openapiContext: [
             'type' => 'boolean',
             'description' => 'en ligne ou pas'

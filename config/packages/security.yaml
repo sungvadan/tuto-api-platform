@@ -23,6 +23,7 @@ security:
             security: false
         apiKey:
             anonymous: true
+            stateless: true
             pattern:   ^/api
             provider: api_key_user_provider
             guard:
