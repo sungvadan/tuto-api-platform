@@ -83,7 +83,7 @@ use Symfony\Component\Validator\Constraints\Valid;
     ),
    ApiFilter(SearchFilter::class, properties: ['id' => 'exact', 'title' => 'partial'] )
 ]
-class Post
+class Post implements UserOwnedInterface
 {
     /**
      * @ORM\Id
@@ -144,6 +144,11 @@ class Post
         ])
     ]
     private $online = false;
+
+    /**
+     * @ORM\ManyToOne(targetEntity=User::class, inversedBy="posts")
+     */
+    private $user;
 
     public function __construct()
     {
@@ -236,6 +241,18 @@ class Post
     public function setOnline(bool $online): self
     {
         $this->online = $online;
+
+        return $this;
+    }
+
+    public function getUser(): ?User
+    {
+        return $this->user;
+    }
+
+    public function setUser(?User $user): self
+    {
+        $this->user = $user;
 
         return $this;
     }
