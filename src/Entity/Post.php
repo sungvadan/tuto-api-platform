@@ -6,6 +6,7 @@ use ApiPlatform\Core\Annotation\ApiFilter;
 use ApiPlatform\Core\Annotation\ApiProperty;
 use ApiPlatform\Core\Annotation\ApiResource;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\SearchFilter;
+use App\Attribute\ApiGroupAuth;
 use App\Controller\PostCountController;
 use App\Controller\PostPublishController;
 use App\Repository\PostRepository;
@@ -46,8 +47,8 @@ use Symfony\Component\Validator\Constraints\Valid;
                 ]
             ]
         ],
-        paginationItemsPerPage: 2,
-        paginationMaximumItemsPerPage: 2,
+//        paginationItemsPerPage: 2,
+//        paginationMaximumItemsPerPage: 2,
         paginationClientItemsPerPage: true,
         collectionOperations: [
             'get' => [
@@ -81,7 +82,11 @@ use Symfony\Component\Validator\Constraints\Valid;
             ]
         ]
     ),
-   ApiFilter(SearchFilter::class, properties: ['id' => 'exact', 'title' => 'partial'] )
+   ApiFilter(SearchFilter::class, properties: ['id' => 'exact', 'title' => 'partial'] ),
+    ApiGroupAuth([
+       'CAN_EDIT' => ['read:collection:Owner'],
+       'ROLE_USER' => ['read:collection:User']
+   ])
 ]
 class Post implements UserOwnedInterface
 {
@@ -137,7 +142,7 @@ class Post implements UserOwnedInterface
      * @ORM\Column(type="boolean", options={"default"="0"})
      */
     #[
-        Groups(['read:collection:User']),
+        Groups(['read:collection:Owner']),
         ApiProperty(openapiContext: [
             'type' => 'boolean',
             'description' => 'en ligne ou pas'

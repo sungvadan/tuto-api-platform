@@ -44,7 +44,7 @@ class CurrentUserExtension implements QueryCollectionExtensionInterface, QueryIt
             $alias = $queryBuilder->getAllAliases()[0];
             $user = $this->security->getUser();
             if ($user) {
-                $queryBuilder->andWhere("$alias.user = :currentUser")
+                $queryBuilder->andWhere("$alias.user = :currentUser or $alias.user is null")
                     ->setParameter('currentUser', $this->security->getUser());
             } else {
                 $queryBuilder->andWhere("$alias.user is null");

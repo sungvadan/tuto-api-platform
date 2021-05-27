@@ -3,13 +3,14 @@
 namespace App\Serializer;
 
 use App\Entity\Post;
+use App\Entity\UserOwnedInterface;
 use App\Security\Voter\UserOwnedVoter;
 use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 use Symfony\Component\Serializer\Normalizer\ContextAwareNormalizerInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerAwareInterface;
 use Symfony\Component\Serializer\Normalizer\NormalizerAwareTrait;
 
-class PostNormalizer implements ContextAwareNormalizerInterface, NormalizerAwareInterface
+class UserOwnedNormalizer implements ContextAwareNormalizerInterface, NormalizerAwareInterface
 {
     use NormalizerAwareTrait;
 
@@ -23,7 +24,7 @@ class PostNormalizer implements ContextAwareNormalizerInterface, NormalizerAware
     public function supportsNormalization($data, string $format = null, array $context = [])
     {
         $alreadyNormalize = $context[self::ALREADY_NORMALIZE] ?? false;
-        return $data instanceof Post && $alreadyNormalize === false;
+        return $data instanceof UserOwnedInterface && $alreadyNormalize === false;
     }
 
     public function normalize($object, string $format = null, array $context = [])

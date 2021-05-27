@@ -33,7 +33,7 @@ class UserOwnedVoter extends Voter
 
         switch ($attribute) {
             case self::CAN_EDIT:
-                 return  $owner->getId() === $user->getId();
+                 return  $owner && $owner->getId() === $user->getId();
         }
 
         return false;
