@@ -8,48 +8,21 @@ use ApiPlatform\Core\Annotation\ApiResource;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\SearchFilter;
 use App\Attribute\ApiGroupAuth;
 use App\Controller\PostCountController;
+use App\Controller\PostImageController;
 use App\Controller\PostPublishController;
 use App\Repository\PostRepository;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\HttpFoundation\File\File;
 use Symfony\Component\Serializer\Annotation\Groups;
 use Symfony\Component\Validator\Constraints\Length;
 use Symfony\Component\Validator\Constraints\Valid;
-
+use Vich\UploaderBundle\Mapping\Annotation as Vich;
 /**
  * @ORM\Entity(repositoryClass=PostRepository::class)
+ * @Vich\Uploadable()
  */
 #[
     ApiResource(
-        normalizationContext: ['groups' => 'read:collection'],
-        denormalizationContext: ['groups' => ['write:Post']],
-        itemOperations: [
-            'put',
-            'delete',
-            'get' => [
-                'normalization_context' => ['groups' => ['read:collection', 'read:item', 'read:Post']]
-            ],
-            'publish' => [
-                'method' => 'POST',
-                'path' => '/post/{id}/publish',
-                'controller' => PostPublishController::class,
-                'status' => 200,
-                'openapi_context' => [
-                    'summary' => 'Permet de publier un article',
-                    'requestBody' => [
-                        'content' => [
-                            'application/json' => [
-                                'schema' => [
-                                    "type" => "object"
-                                ]
-                            ]
-                        ]
-                    ]
-                ]
-            ]
-        ],
-//        paginationItemsPerPage: 2,
-//        paginationMaximumItemsPerPage: 2,
-        paginationClientItemsPerPage: true,
         collectionOperations: [
             'get' => [
                 'openapi_context' => [
@@ -80,7 +53,43 @@ use Symfony\Component\Validator\Constraints\Valid;
                     ]
                 ]
             ]
-        ]
+        ],
+        itemOperations: [
+            'put',
+            'delete',
+            'get' => [
+                'normalization_context' => ['groups' => ['read:collection', 'read:item', 'read:Post']]
+            ],
+            'publish' => [
+                'method' => 'POST',
+                'path' => '/posts/{id}/publish',
+                'controller' => PostPublishController::class,
+                'status' => 200,
+                'openapi_context' => [
+                    'summary' => 'Permet de publier un article',
+                    'requestBody' => [
+                        'content' => [
+                            'application/json' => [
+                                'schema' => [
+                                    "type" => "object"
+                                ]
+                            ]
+                        ]
+                    ]
+                ]
+            ],
+            'image' => [
+                'method' => 'POST',
+                'path' => '/posts/{id}/image',
+                'deserialize' => false,
+                'controller' => PostImageController::class
+            ]
+        ],
+        denormalizationContext: ['groups' => ['write:Post']],
+//        paginationItemsPerPage: 2,
+//        paginationMaximumItemsPerPage: 2,
+        normalizationContext: ['groups' => 'read:collection'],
+        paginationClientItemsPerPage: true
     ),
    ApiFilter(SearchFilter::class, properties: ['id' => 'exact', 'title' => 'partial'] ),
     ApiGroupAuth([
@@ -142,7 +151,8 @@ class Post implements UserOwnedInterface
      * @ORM\Column(type="boolean", options={"default"="0"})
      */
     #[
-        Groups(['read:collection:Owner']),
+        Groups(['read:collection:Owner
+        ']),
         ApiProperty(openapiContext: [
             'type' => 'boolean',
             'description' => 'en ligne ou pas'
@@ -154,6 +164,25 @@ class Post implements UserOwnedInterface
      * @ORM\ManyToOne(targetEntity=User::class, inversedBy="posts")
      */
     private $user;
+
+    /**
+     * @ORM\Column(type="string", length=255)
+     * @var string|null
+     */
+    #[Groups(['read:collection'])]
+    private $image;
+
+    /**
+     * @Vich\UploadableField(mapping="post_images", fileNameProperty="image")
+     * @var File|null
+     */
+    private $imageFile;
+
+    /**
+     * @var string|null
+     */
+    #[Groups(['read:collection'])]
+    private $imageUrl;
 
     public function __construct()
     {
@@ -259,6 +288,60 @@ class Post implements UserOwnedInterface
     {
         $this->user = $user;
 
+        return $this;
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getImage(): ?string
+    {
+        return $this->image;
+    }
+
+    /**
+     * @param string|null $image
+     * @return Post
+     */
+    public function setImage(?string $image): Post
+    {
+        $this->image = $image;
+        return $this;
+    }
+
+    /**
+     * @return File|null
+     */
+    public function getImageFile(): ?File
+    {
+        return $this->imageFile;
+    }
+
+    /**
+     * @param File|null $imageFile
+     * @return Post
+     */
+    public function setImageFile(?File $imageFile): Post
+    {
+        $this->imageFile = $imageFile;
+        return $this;
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getImageUrl(): ?string
+    {
+        return $this->imageUrl;
+    }
+
+    /**
+     * @param string|null $imageUrl
+     * @return Post
+     */
+    public function setImageUrl(?string $imageUrl): Post
+    {
+        $this->imageUrl = $imageUrl;
         return $this;
     }
 }
