@@ -90,7 +90,7 @@ use Vich\UploaderBundle\Mapping\Annotation as Vich;
                                 'schema' => [
                                     'type' => 'object',
                                     'properties' => [
-                                        'image' => [
+                                        'imageFile' => [
                                             'type' => 'string',
                                             'format' => 'binary'
                                         ]
