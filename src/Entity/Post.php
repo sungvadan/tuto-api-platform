@@ -81,8 +81,25 @@ use Vich\UploaderBundle\Mapping\Annotation as Vich;
             'image' => [
                 'method' => 'POST',
                 'path' => '/posts/{id}/image',
-                'deserialize' => false,
-                'controller' => PostImageController::class
+//                'deserialize' => false,
+                'controller' => PostImageController::class,
+                'openapi_context' => [
+                    'requestBody' => [
+                        'content' => [
+                            'multipart/form-data' => [
+                                'schema' => [
+                                    'type' => 'object',
+                                    'properties' => [
+                                        'image' => [
+                                            'type' => 'string',
+                                            'format' => 'binary'
+                                        ]
+                                    ]
+                                ]
+                            ]
+                        ]
+                    ]
+                ]
             ]
         ],
         denormalizationContext: ['groups' => ['write:Post']],
@@ -176,6 +193,7 @@ class Post implements UserOwnedInterface
      * @Vich\UploadableField(mapping="post_images", fileNameProperty="image")
      * @var File|null
      */
+    #[Groups(['write:Post'])]
     private $imageFile;
 
     /**

@@ -17,7 +17,7 @@ class PostImageController
             throw new NotFoundHttpException('No Post');
         }
 
-        $post->setImageFile($request->files->get('file'));
+        $post->setImageFile($request->files->get('image'));
         $post->setUpdatedAt(new \DateTime());
         return $post;
     }
