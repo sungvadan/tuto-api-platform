@@ -47,4 +47,13 @@ class PostRepository extends ServiceEntityRepository
         ;
     }
     */
+    public function findWithMaxId(int $id)
+    {
+        return $this->createQueryBuilder('p')
+            ->andWhere('p.id > :val')
+            ->setParameter('val', $id)
+            ->getQuery()
+            ->getResult()
+            ;
+    }
 }

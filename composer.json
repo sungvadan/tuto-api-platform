@@ -32,7 +32,8 @@
         "symfony/uid": "5.2.*",
         "symfony/validator": "5.2.*",
         "symfony/yaml": "5.2.*",
-        "vich/uploader-bundle": "^1.17"
+        "vich/uploader-bundle": "^1.17",
+        "webonyx/graphql-php": "^14.7"
     },
     "config": {
         "optimize-autoloader": true,

@@ -5,12 +5,14 @@ namespace App\Entity;
 use ApiPlatform\Core\Annotation\ApiFilter;
 use ApiPlatform\Core\Annotation\ApiProperty;
 use ApiPlatform\Core\Annotation\ApiResource;
+use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\OrderFilter;
 use ApiPlatform\Core\Bridge\Doctrine\Orm\Filter\SearchFilter;
 use App\Attribute\ApiGroupAuth;
 use App\Controller\PostCountController;
 use App\Controller\PostImageController;
 use App\Controller\PostPublishController;
 use App\Repository\PostRepository;
+use App\Resolver\PostMaxIdResolver;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\HttpFoundation\File\File;
 use Symfony\Component\Serializer\Annotation\Groups;
@@ -106,13 +108,34 @@ use Vich\UploaderBundle\Mapping\Annotation as Vich;
 //        paginationItemsPerPage: 2,
 //        paginationMaximumItemsPerPage: 2,
         normalizationContext: ['groups' => 'read:collection'],
-        paginationClientItemsPerPage: true
+        paginationClientItemsPerPage: true,
+        graphql: [
+            'item_query',
+            'collection_query' => [
+                'pagination_type' => 'page'
+            ],
+            'create' => [
+                'validation_groups' => ['create:Post'],
+                'security' => 'is_granted("ROLE_USER")'
+            ],
+            'update',
+            'delete',
+            'maxIdQuery' => [
+                'read' => false,
+                'pagination_enabled' => false,
+                'collection_query' => PostMaxIdResolver::class,
+                'args' => [
+                    'id' => ['type' => 'Int']
+                ]
+            ]
+        ]
     ),
    ApiFilter(SearchFilter::class, properties: ['id' => 'exact', 'title' => 'partial'] ),
-    ApiGroupAuth([
+   ApiFilter(OrderFilter::class, properties: ['id', 'title'] ),
+   ApiGroupAuth([
        'CAN_EDIT' => ['read:collection:Owner'],
        'ROLE_USER' => ['read:collection:User']
-   ])
+   ]),
 ]
 class Post implements UserOwnedInterface
 {
@@ -183,7 +206,7 @@ class Post implements UserOwnedInterface
     private $user;
 
     /**
-     * @ORM\Column(type="string", length=255)
+     * @ORM\Column(type="string", length=255, nullable=true)
      * @var string|null
      */
     #[Groups(['read:collection'])]
